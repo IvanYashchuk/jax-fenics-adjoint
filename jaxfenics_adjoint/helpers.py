@@ -1,6 +1,9 @@
 import fenics
+import pyadjoint
 import jax
 import numpy as np
+
+import warnings
 
 from typing import Type, List, Union, Iterable, Callable, Tuple
 
@@ -28,10 +31,13 @@ def fenics_to_numpy(fenics_var):
             data = fenics_var.get_local()
         return np.asarray(data)
 
+    if isinstance(fenics_var, (pyadjoint.AdjFloat, float)):
+        return np.asarray(fenics_var)
+
     raise ValueError("Cannot convert " + str(type(fenics_var)))
 
 
-def numpy_to_fenics(numpy_array, fenics_var_template):
+def numpy_to_fenics(numpy_array, fenics_var_template):  # noqa: C901
     """Convert numpy/jax array to FEniCS variable"""
 
     if isinstance(fenics_var_template, fenics.Constant):
@@ -42,8 +48,6 @@ def numpy_to_fenics(numpy_array, fenics_var_template):
 
         if isinstance(numpy_array, (jax.abstract_arrays.ShapedArray,)):
             if not isinstance(numpy_array, (jax.abstract_arrays.ConcreteArray,)):
-                import warnings
-
                 warnings.warn(
                     "Got JAX tracer type to convert to FEniCS. Returning zero."
                 )
@@ -97,8 +101,6 @@ def numpy_to_fenics(numpy_array, fenics_var_template):
 
         if isinstance(numpy_array, (jax.abstract_arrays.ShapedArray,)):
             if not isinstance(numpy_array, (jax.abstract_arrays.ConcreteArray,)):
-                import warnings
-
                 warnings.warn(
                     "Got JAX tracer type to convert to FEniCS. Returning zero."
                 )
@@ -115,6 +117,17 @@ def numpy_to_fenics(numpy_array, fenics_var_template):
         u.vector().set_local(local_array)
         u.vector().apply("insert")
         return u
+
+    if isinstance(fenics_var_template, pyadjoint.AdjFloat):
+        if isinstance(numpy_array, (jax.core.Tracer,)):
+            numpy_array = jax.core.get_aval(numpy_array)
+        if isinstance(numpy_array, (jax.abstract_arrays.ShapedArray,)):
+            if not isinstance(numpy_array, (jax.abstract_arrays.ConcreteArray,)):
+                warnings.warn(
+                    "Got JAX tracer type to convert to FEniCS. Returning zero."
+                )
+                return 0.0
+        return float(numpy_array)
 
     err_msg = f"Cannot convert numpy/jax array to {fenics_var_template}"
     raise ValueError(err_msg)
