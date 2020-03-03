@@ -150,7 +150,8 @@ def vjp_fem_eval_impl(
 
     tape.reset_variables()
     fenics_output.block_variable.adj_value = adj_value
-    tape.evaluate_adj()
+    with tape.marked_nodes(fenics_inputs):
+        tape.evaluate_adj(markings=True)
     fenics_grads = [fi.block_variable.adj_value for fi in fenics_inputs]
 
     # Convert FEniCS gradients to jax array representation
