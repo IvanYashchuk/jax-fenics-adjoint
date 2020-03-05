@@ -48,6 +48,20 @@ ff1 = lambda y: ff(inputs[0], y, inputs[2])  # noqa: E731
 ff2 = lambda z: ff(inputs[0], inputs[1], z)  # noqa: E731
 
 
+def test_vmap():
+    bdim = 2
+    vinputs = (
+        np.ones((bdim, V.dim())),
+        np.ones((bdim, 1)) * 0.5,
+        np.ones((bdim, 1)) * 0.6,
+    )
+    out = jax.vmap(ff)(*vinputs)
+    with check:
+        assert out.shape[0] == bdim
+    with check:
+        assert np.all(out == out[0])
+
+
 def test_jacobian_and_vjp():
     rngkey = jax.random.PRNGKey(0)
     v = jax.random.normal(rngkey, shape=(V.dim(),), dtype="float64")
