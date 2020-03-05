@@ -121,11 +121,8 @@ def vjp_fem_eval(
         assert (
             batch_axes[0] == 0
         )  # assert that batch axis is zero, need to rewrite for a general case?
-        # compute function row-by-row
-        res = [
-            vjp_fun1(vector_arg_values[0][i])
-            for i in range(vector_arg_values[0].shape[0])
-        ]
+        # apply function row-by-row
+        res = list(map(vjp_fun1, *vector_arg_values))
         # transpose resulting list
         res_T = list(itertools.zip_longest(*res))
         return tuple(map(np.vstack, res_T)), (batch_axes[0],) * len(args)
