@@ -78,7 +78,7 @@ Then install [dolfin-adjoint](http://www.dolfin-adjoint.org/en/latest/) with:
 
 Then install [JAX](https://github.com/google/jax) with:
 
-    python -m pip install --upgrade jax jaxlib  # CPU-only version
+    python -m pip install --upgrade jax==0.1.61 jaxlib==0.1.42  # CPU-only version
 
 After that install the jax-fenics-adjoint with:
 
