@@ -27,7 +27,7 @@ import fenics_adjoint
 import ufl
 
 from jaxfenics_adjoint import build_jax_fem_eval
-from jaxfenics_adjoint import numpy_to_fenics
+from fenics_numpy import numpy_to_fenics
 
 # Create mesh for the unit square domain
 n = 10
