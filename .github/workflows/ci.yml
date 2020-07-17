@@ -40,6 +40,7 @@ jobs:
           conda activate fenicsproject
           python -m pip install --upgrade pip
           python -m pip install git+https://github.com/dolfin-adjoint/pyadjoint.git@master
+          python -m pip install git+https://github.com/IvanYashchuk/numpy-fenics-adjoint
           python -m pip install pytest
           python -m pip install pytest-cov
           python -m pip install pytest-check

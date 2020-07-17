@@ -3,41 +3,65 @@ import pyadjoint
 import jax
 import numpy as np
 
+from fenics_numpy import numpy_to_fenics
+
 import warnings
 
 from typing import Type, List, Union, Iterable, Callable, Tuple
 
 FenicsVariable = Union[fenics.Constant, fenics.Function]
+JAXArray = Union[jax.numpy.array, np.array]
 
 
-def fenics_to_numpy(fenics_var):
-    """Convert FEniCS variable to numpy/jax array.
-    Serializes the input so that all processes have the same data."""
-    if isinstance(fenics_var, fenics.Constant):
-        return np.asarray(fenics_var.values())
+def jax_to_fenics_numpy(
+    jax_array: JAXArray, fenics_var_template: FenicsVariable
+) -> np.array:
+    """Convert JAX symbolic variables to concrete NumPy array compatible with FEniCS"""
 
-    if isinstance(fenics_var, fenics.Function):
-        fenics_vec = fenics_var.vector()
-        if fenics_vec.mpi_comm().size > 1:
-            data = fenics_vec.gather(np.arange(fenics_vec.size(), dtype="I"))
-        else:
-            data = fenics_vec.get_local()
-        return np.asarray(data)
+    # JAX tracer specific part. Here we return zero values if tracer is not ConcreteArray type.
+    if isinstance(jax_array, jax.ad_util.Zero):
+        if isinstance(fenics_var_template, fenics.Constant):
+            numpy_array = np.zeros_like(fenics_var_template.values())
+            return numpy_array
+        elif isinstance(fenics_var_template, fenics.Function):
+            numpy_array = np.zeros(fenics_var_template.vector().size())
+            return numpy_array
 
-    if isinstance(fenics_var, fenics.GenericVector):
-        if fenics_var.mpi_comm().size > 1:
-            data = fenics_var.gather(np.arange(fenics_var.size(), dtype="I"))
-        else:
-            data = fenics_var.get_local()
-        return np.asarray(data)
+    elif isinstance(jax_array, (jax.core.Tracer,)):
+        numpy_array = jax.core.get_aval(jax_array)
+        return numpy_array
 
-    if isinstance(fenics_var, (pyadjoint.AdjFloat, float)):
-        return np.asarray(fenics_var)
+    elif isinstance(jax_array, (jax.abstract_arrays.ShapedArray,)):
+        if not isinstance(jax_array, (jax.abstract_arrays.ConcreteArray,)):
+            warnings.warn("Got JAX tracer type to convert to FEniCS. Returning zero.")
+            numpy_array = np.zeros(jax_array.shape)
+            return numpy_array
 
-    raise ValueError("Cannot convert " + str(type(fenics_var)))
+        elif isinstance(jax_array, (jax.abstract_arrays.ConcreteArray,)):
+            numpy_array = jax_array.val
+            return numpy_array
+
+    else:
+        numpy_array = np.asarray(jax_array)
+        return numpy_array
 
 
-def numpy_to_fenics(numpy_array, fenics_var_template):  # noqa: C901
+def jax_to_fenics(
+    jax_array: JAXArray, fenics_var_template: FenicsVariable
+) -> FenicsVariable:  # noqa: C901
+    """Convert numpy/jax array to FEniCS variable"""
+
+    # if not isinstance(jax_array, np.ndarray):
+    #     return _jax_to_fenics(jax_array, fenics_var_template)
+    #     numpy_array = jax_to_fenics_numpy(jax_array, fenics_var_template)
+    #     return numpy_to_fenics(numpy_array, fenics_var_template)
+    # else:
+    return numpy_to_fenics(
+        jax_to_fenics_numpy(jax_array, fenics_var_template), fenics_var_template
+    )
+
+
+def _jax_to_fenics(numpy_array, fenics_var_template):  # noqa: C901
     """Convert numpy/jax array to FEniCS variable"""
 
     if isinstance(fenics_var_template, fenics.Constant):
@@ -131,49 +155,3 @@ def numpy_to_fenics(numpy_array, fenics_var_template):  # noqa: C901
 
     err_msg = f"Cannot convert numpy/jax array to {fenics_var_template}"
     raise ValueError(err_msg)
-
-
-def get_numpy_input_templates(
-    fenics_input_templates: Iterable[FenicsVariable],
-) -> List[np.array]:
-    """Returns tuple of numpy representations of the input templates to FEniCSFunctional.forward"""
-    numpy_input_templates = [fenics_to_numpy(x) for x in fenics_input_templates]
-    return numpy_input_templates
-
-
-def check_input(fenics_templates: FenicsVariable, *args: FenicsVariable) -> None:
-    """Checks that the number of inputs arguments is correct"""
-    n_args = len(args)
-    expected_nargs = len(fenics_templates)
-    if n_args != expected_nargs:
-        raise ValueError(
-            "Wrong number of arguments"
-            " Expected {} got {}.".format(expected_nargs, n_args)
-        )
-
-    # Check that each input argument has correct dimensions
-    numpy_templates = get_numpy_input_templates(fenics_templates)
-    for i, (arg, template) in enumerate(zip(args, numpy_templates)):
-        if arg.shape != template.shape:
-            raise ValueError(
-                "Expected input shape {} for input"
-                " {} but got {}.".format(template.shape, i, arg.shape)
-            )
-
-    # Check that the inputs are of double precision
-    for i, arg in enumerate(args):
-        if arg.dtype != np.float64:
-            raise TypeError(
-                "All inputs must be type {},"
-                " but got {} for input {}.".format(np.float64, arg.dtype, i)
-            )
-
-
-def convert_all_to_fenics(
-    fenics_templates: FenicsVariable, *args: np.array
-) -> List[FenicsVariable]:
-    """Converts input array to corresponding FEniCS variables"""
-    fenics_inputs = []
-    for inp, template in zip(args, fenics_templates):
-        fenics_inputs.append(numpy_to_fenics(inp, template))
-    return fenics_inputs
