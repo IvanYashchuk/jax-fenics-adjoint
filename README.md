@@ -27,7 +27,7 @@ import fenics_adjoint
 import ufl
 
 from jaxfenics_adjoint import build_jax_fem_eval
-from jaxfenics_adjoint import numpy_to_fenics
+from fenics_numpy import numpy_to_fenics
 
 # Create mesh for the unit square domain
 n = 10
@@ -76,11 +76,15 @@ Then install [dolfin-adjoint](http://www.dolfin-adjoint.org/en/latest/) with:
 
     python -m pip install git+https://github.com/dolfin-adjoint/pyadjoint.git@master
 
+Then install [numpy-fenics-adjoint](https://github.com/IvanYashchuk/numpy-fenics-adjoint) with:
+
+    python -m pip install git+https://github.com/IvanYashchuk/numpy-fenics-adjoint@master
+
 Then install [JAX](https://github.com/google/jax) with:
 
     python -m pip install --upgrade jax==0.1.61 jaxlib==0.1.42  # CPU-only version
 
-After that install the jax-fenics-adjoint with:
+After that install jax-fenics-adjoint with:
 
     python -m pip install git+https://github.com/IvanYashchuk/jax-fenics-adjoint.git@master
 
