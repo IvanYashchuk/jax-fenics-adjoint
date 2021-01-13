@@ -46,7 +46,7 @@ jobs:
           python -m pip install pytest-check
           python -m pip install coveralls
           python -m pip install fdm
-          python -m pip install --upgrade jax==0.1.61 jaxlib==0.1.42
+          python -m pip install --upgrade jax jaxlib
 
       - name: Install JAX-FEniCS
         shell: bash -l {0}
