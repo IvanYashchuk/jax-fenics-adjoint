@@ -90,7 +90,7 @@ def vjp_fem_eval(
         res_T = list(itertools.zip_longest(*res))
         return tuple(map(np.vstack, res_T)), (batch_axes[0],) * len(args)
 
-    jax.batching.primitive_batchers[vjp_fun1_p] = vjp_fun1_batch
+    jax.interpreters.batching.primitive_batchers[vjp_fun1_p] = vjp_fun1_batch
 
     return numpy_output, vjp_fun1
 
@@ -133,7 +133,9 @@ def build_jax_fem_eval(fenics_templates: FenicsVariable) -> Callable:
             res = np.asarray(res)
             return res, batch_axes[0]
 
-        jax.batching.primitive_batchers[jax_fem_eval_p] = jax_fem_eval_batch
+        jax.interpreters.batching.primitive_batchers[
+            jax_fem_eval_p
+        ] = jax_fem_eval_batch
 
         # @trace("djax_fem_eval")
         def djax_fem_eval(*args):
@@ -202,7 +204,9 @@ def build_jax_fem_eval_fwd(fenics_templates: FenicsVariable) -> Callable:
             res = np.asarray(res)
             return res, batch_axes[0]
 
-        jax.batching.primitive_batchers[jax_fem_eval_p] = jax_fem_eval_batch
+        jax.interpreters.batching.primitive_batchers[
+            jax_fem_eval_p
+        ] = jax_fem_eval_batch
 
         # @trace("jvp_jax_fem_eval")
         def jvp_jax_fem_eval(ps, ts):
