@@ -41,9 +41,7 @@ inputs = (np.ones(V.dim()), np.ones(1), np.ones(1) * 1.2)
 jax_fem_eval = build_jax_fem_eval_fwd(templates)(solve_fenics)
 
 # multivariate output function
-ff = lambda x, y, z: np.sqrt(  # noqa: E731
-    np.square(jax_fem_eval(x, np.sqrt(y ** 3), z))
-)
+ff = lambda x, y, z: np.sin(np.cos(jax_fem_eval(x, np.sqrt(y ** 3), z)))  # noqa: E731
 ff0 = lambda x: ff(x, inputs[1], inputs[2])  # noqa: E731
 ff1 = lambda y: ff(inputs[0], y, inputs[2])  # noqa: E731
 ff2 = lambda z: ff(inputs[0], inputs[1], z)  # noqa: E731
@@ -63,9 +61,6 @@ def test_vmap():
         assert np.all(out == out[0])
 
 
-# TODO: jax.jvp outputs nans for the positions where primal function returns zero
-# See https://github.com/IvanYashchuk/jax-fenics-adjoint/issues/2
-@pytest.mark.xfail
 def test_jvp():
     for func, inp in zip((ff0, ff1, ff2), inputs):
         dir_v = 0.432543 * np.ones_like(inp)
