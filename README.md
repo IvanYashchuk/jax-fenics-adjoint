@@ -82,7 +82,7 @@ Then install [numpy-fenics-adjoint](https://github.com/IvanYashchuk/numpy-fenics
 
 Then install [JAX](https://github.com/google/jax) with:
 
-    python -m pip install --upgrade jax==0.1.61 jaxlib==0.1.42  # CPU-only version
+    python -m pip install --upgrade jax jaxlib  # CPU-only version
 
 After that install jax-fenics-adjoint with:
 
