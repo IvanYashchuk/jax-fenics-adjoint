@@ -24,7 +24,7 @@ get_aval = jax.core.get_aval
         (make_shaped_array(jax.numpy.ones(2)), fenics.Constant([0.0, 0.0])),
         (get_aval(jax.numpy.asarray(0.66)), fenics.Constant(0.66)),
         (get_aval(jax.numpy.asarray([0.5, 0.66])), fenics.Constant([0.5, 0.66]),),
-        (jax.ad_util.Zero(), fenics.Constant(0.0)),
+        (jax.ad_util.Zero(get_aval(jax.numpy.asarray(0.0))), fenics.Constant(0.0)),
     ],
 )
 def test_jax_to_fenics_constant(test_input, expected):
@@ -36,7 +36,7 @@ def test_jax_to_fenics_constant(test_input, expected):
     "test_input,expected_expr",
     [
         (make_shaped_array(jax.numpy.ones(10)), "0.0"),
-        (jax.ad_util.Zero(), "0.0"),
+        (jax.ad_util.Zero(get_aval(jax.numpy.asarray(0.0))), "0.0"),
         (get_aval(jax.numpy.linspace(0.05, 0.95, num=10)), "x[0]"),
     ],
 )
