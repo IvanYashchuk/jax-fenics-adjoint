@@ -1,0 +1,15 @@
+# .coveragerc to control coverage.py
+[run]
+branch = True
+source = jaxfenics_adjoint
+
+[report]
+ignore_errors = True
+omit =
+    examples/*
+    notebooks/*
+    tests/*
+    setup.py
+
+[html]
+directory = coverage_html
