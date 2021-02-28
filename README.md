@@ -1,13 +1,11 @@
 # jax-fenics-adjoint &middot; [![Build](https://github.com/ivanyashchuk/jax-fenics-adjoint/workflows/CI/badge.svg)](https://github.com/ivanyashchuk/jax-fenics-adjoint/actions?query=workflow%3ACI+branch%3Amaster) [![Coverage Status](https://coveralls.io/repos/github/IvanYashchuk/jax-fenics-adjoint/badge.svg?branch=master)](https://coveralls.io/github/IvanYashchuk/jax-fenics-adjoint?branch=master)
 
-This package enables use of [FEniCS](http://fenicsproject.org) for solving differentiable variational problems in [JAX](https://github.com/google/jax).
+This package enables use of [FEniCS](https://fenicsproject.org/) or [Firedrake](https://firedrakeproject.org/) for solving differentiable variational problems in [JAX](https://github.com/google/jax).
 
-Automatic tangent linear and adjoint solvers for FEniCS programs are derived with [dolfin-adjoint/pyadjoint](http://www.dolfin-adjoint.org/en/latest/).
-These solvers make it possible to use JAX's forward and reverse Automatic Differentiation with FEniCS.
+Automatic tangent linear and adjoint solvers for FEniCS/Firedrake programs are derived with [dolfin-adjoint/pyadjoint](http://www.dolfin-adjoint.org/en/latest/).
+These solvers make it possible to use JAX's forward and reverse Automatic Differentiation with FEniCS/Firedrake.
 
 For using JAX-FEniCS without dolfin-adjoint (still differentiable with automatic tangent and adjoint solvers using [UFL](https://github.com/FEniCS/ufl)) check out [jax-fenics](https://github.com/IvanYashchuk/jax-fenics).
-
-For JAX-Firedrake interface see [jax-firedrake](https://github.com/IvanYashchuk/jax-firedrake).
 
 Current limitations:
 * Composition of forward and reverse modes for higher-order derivatives is not implemented yet.
@@ -71,8 +69,8 @@ assert dudf.shape == (V.dim(), W.dim())
 Check `examples/` or `tests/` folders for the additional examples.
 
 ## Installation
-First install [FEniCS](http://fenicsproject.org).
-Then install [dolfin-adjoint](http://www.dolfin-adjoint.org/en/latest/) with:
+First install [FEniCS](https://fenicsproject.org/download/) or [Firedrake](https://firedrakeproject.org/download.html).
+Then install [pyadjoint](http://www.dolfin-adjoint.org/en/latest/) with:
 
     python -m pip install git+https://github.com/dolfin-adjoint/pyadjoint.git@master
 
@@ -94,6 +92,12 @@ If you found a bug, create an [issue].
 
 [issue]: https://github.com/IvanYashchuk/jax-fenics-adjoint/issues/new
 
+## Asking questions and general discussion
+
+If you have a question or anything else, create a new [discussion]. Using issues is also fine!
+
+[discussion]: https://github.com/IvanYashchuk/jax-fenics-adjoint/discussions/new
+
 ## Contributing
 
 Pull requests are welcome from everyone.
@@ -104,7 +108,7 @@ Fork, then clone the repository:
 
 Make your change. Add tests for your change. Make the tests pass:
 
-    pytest tests/
+    pytest tests/fenics  # or pytest tests/firedrake
 
 Check the formatting with `black` and `flake8`. Push to your fork and [submit a pull request][pr].
 
