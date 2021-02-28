@@ -27,7 +27,7 @@ import fenics_adjoint
 import ufl
 
 from jaxfenics_adjoint import build_jax_fem_eval
-from fenics_numpy import numpy_to_fenics
+from fecr import from_numpy
 
 # Create mesh for the unit square domain
 n = 10
@@ -56,7 +56,7 @@ def fenics_solve(f):
 # Let's create a vector of ones with size equal to the number of cells in the mesh
 f = np.ones(W.dim())
 u = fenics_solve(f) # u is JAX's array
-u_fenics = numpy_to_fenics(u, fenics.Function(V)) # we need to explicitly provide template function for conversion
+u_fenics = from_numpy(u, fenics.Function(V)) # we need to explicitly provide template function for conversion
 
 # now we can calculate vector-Jacobian product with `jax.vjp`
 jvp_result = jax.vjp(fenics_solve, f)[1](np.ones_like(u))
@@ -76,9 +76,9 @@ Then install [dolfin-adjoint](http://www.dolfin-adjoint.org/en/latest/) with:
 
     python -m pip install git+https://github.com/dolfin-adjoint/pyadjoint.git@master
 
-Then install [numpy-fenics-adjoint](https://github.com/IvanYashchuk/numpy-fenics-adjoint) with:
+Then install [fecr](https://github.com/IvanYashchuk/fecr) with:
 
-    python -m pip install git+https://github.com/IvanYashchuk/numpy-fenics-adjoint@master
+    python -m pip install git+https://github.com/IvanYashchuk/fecr@master
 
 Then install [JAX](https://github.com/google/jax) with:
 
