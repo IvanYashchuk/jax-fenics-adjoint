@@ -1,18 +1,18 @@
-from distutils.core import setup
+from setuptools import setup
 
 import sys
 
-if sys.version_info[0] < 3:
-    raise Exception(
-        "The JAX-FEniCS-Adjoint only supports Python3. Did you run $python setup.py <option>.? Try running $python3 setup.py <option>."
-    )
+if sys.version_info < (3, 6):
+    print("Python 3.6 or higher required, please upgrade.")
+    sys.exit(1)
 
 setup(
     name="jaxfenics_adjoint",
+    version="1.0.0",
     description="JAX-FEniCS interface using dolfin-adjoint",
     url="https://github.com/IvanYashchuk/jax-fenics",
     author="Ivan Yashchuk",
     license="MIT",
     packages=["jaxfenics_adjoint"],
-    install_requires=["jax", "fenics", "fdm", "scipy"],
+    install_requires=["jax", "fdm", "fecr"],
 )
