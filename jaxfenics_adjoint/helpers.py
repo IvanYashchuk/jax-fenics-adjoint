@@ -20,10 +20,10 @@ def jax_to_fenics_numpy(jax_array: JAXArray, fem_variable: BackendVariable) -> n
 
     # JAX tracer specific part. Here we return zero values if tracer is not ConcreteArray type.
     if isinstance(jax_array, jax.ad_util.Zero):
-        if isinstance(fem_variable, fem_backend.Constant):
+        if isinstance(fem_variable, fem_backend.lib.Constant):
             numpy_array = np.zeros_like(fem_variable.values())
             return numpy_array
-        elif isinstance(fem_variable, fem_backend.Function):
+        elif isinstance(fem_variable, fem_backend.lib.Function):
             numpy_array = np.zeros(fem_variable.vector().size())
             return numpy_array
 
