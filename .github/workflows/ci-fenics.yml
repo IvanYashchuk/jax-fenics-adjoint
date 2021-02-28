@@ -67,7 +67,7 @@ jobs:
         run: |
           conda activate fenicsproject
           python -c "import sys; print('\n'.join(sys.path))"
-          python -m pytest --cov=jaxfenics_adjoint tests/fenics -vvv
+          python -m pytest --cov=jaxfenics_adjoint --cov-config=tests/.coveragerc tests/fenics -vvv
 
       - name: Send coveralls
         shell: bash -l {0}

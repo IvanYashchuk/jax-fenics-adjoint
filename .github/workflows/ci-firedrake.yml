@@ -57,7 +57,7 @@ jobs:
         run: |
           source /home/firedrake/firedrake/bin/activate
           python -c "import sys; print('\n'.join(sys.path))"
-          python -m pytest --cov=fecr tests/firedrake -vvv
+          python -m pytest --cov=fecr --cov-config=tests/.coveragerc tests/firedrake -vvv
 
       - name: Send coveralls
         shell: bash -l {0}
