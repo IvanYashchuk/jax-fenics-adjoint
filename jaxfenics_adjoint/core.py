@@ -1,8 +1,3 @@
-import fenics
-import fenics_adjoint
-import pyadjoint
-import ufl
-
 import jax
 import jax.numpy as np
 
@@ -13,17 +8,17 @@ from jax.api import defjvp_all
 import functools
 import itertools
 
-from fenics_numpy import evaluate_primal, evaluate_vjp, evaluate_jvp
+from fecr import evaluate_primal, evaluate_pullback, evaluate_pushforward
 
-from .helpers import FenicsVariable
+from .helpers import BackendVariable
 from .helpers import jax_to_fenics_numpy
 
-from typing import Type, List, Union, Iterable, Callable, Tuple
+from typing import Collection, Callable, Tuple
 
 
 def vjp_fem_eval(
     fenics_function: Callable,
-    fenics_templates: Iterable[FenicsVariable],
+    fenics_templates: Collection[BackendVariable],
     *args: np.array,
 ) -> Tuple[np.array, Callable]:
     """Computes the gradients of the output with respect to the input
@@ -50,7 +45,9 @@ def vjp_fem_eval(
     vjp_fun1_p.def_impl(
         lambda g: tuple(
             vjp if vjp is not None else jax.ad_util.zeros_like_jaxval(args[i])
-            for i, vjp in enumerate(evaluate_vjp(g, fenics_output, fenics_inputs, tape))
+            for i, vjp in enumerate(
+                evaluate_pullback(fenics_output, fenics_inputs, tape, g)
+            )
         )
     )
 
@@ -95,7 +92,7 @@ def vjp_fem_eval(
     return numpy_output, vjp_fun1
 
 
-def build_jax_fem_eval(fenics_templates: FenicsVariable) -> Callable:
+def build_jax_fem_eval(fenics_templates: BackendVariable) -> Callable:
     """Return `f(*args) = build_jax_fem_eval(*args)(ofunc(*args))`.
     This is for reverse mode AD.
     Given the FEniCS-side function ofunc(*args), return the function
@@ -142,7 +139,7 @@ def build_jax_fem_eval(fenics_templates: FenicsVariable) -> Callable:
             return djax_fem_eval_p.bind(*args)
 
         djax_fem_eval_p = Primitive("djax_fem_eval")
-        # djax_fem_eval_p.multiple_results = True
+        djax_fem_eval_p.multiple_results = True
         djax_fem_eval_p.def_impl(
             lambda *args: vjp_fem_eval(fenics_function, fenics_templates, *args)
         )
@@ -157,7 +154,7 @@ def build_jax_fem_eval(fenics_templates: FenicsVariable) -> Callable:
 # at least I did not figure out how to do this
 # they override each other
 # therefore here I create a separate wrapped function
-def build_jax_fem_eval_fwd(fenics_templates: FenicsVariable) -> Callable:
+def build_jax_fem_eval_fwd(fenics_templates: BackendVariable) -> Callable:
     """Return `f(*args) = build_jax_fem_eval(*args)(ofunc(*args))`.
     This is for forward mode AD.
     Given the FEniCS-side function ofunc(*args), return the function
@@ -215,10 +212,21 @@ def build_jax_fem_eval_fwd(fenics_templates: FenicsVariable) -> Callable:
         jvp_jax_fem_eval_p = Primitive("jvp_jax_fem_eval")
         jvp_jax_fem_eval_p.multiple_results = True
 
-        def jvp_jax_fem_eval_impl(ps, ts):
-            ps = (jax_to_fenics_numpy(p, ft) for p, ft in zip(ps, fenics_templates))
-            ts = (jax_to_fenics_numpy(t, ft) for t, ft in zip(ts, fenics_templates))
-            return evaluate_jvp(fenics_function, fenics_templates, ps, ts)
+        def jvp_jax_fem_eval_impl(primals, tangents):
+            primals = (
+                jax_to_fenics_numpy(p, ft) for p, ft in zip(primals, fenics_templates)
+            )
+            numpy_output, fenics_output, fenics_inputs, tape = evaluate_primal(
+                fenics_function, fenics_templates, *primals
+            )
+
+            tangents = (
+                jax_to_fenics_numpy(t, ft) for t, ft in zip(tangents, fenics_templates)
+            )
+            dnumpy_output = evaluate_pushforward(
+                fenics_output, fenics_inputs, tape, tangents
+            )
+            return numpy_output, dnumpy_output
 
         jvp_jax_fem_eval_p.def_impl(jvp_jax_fem_eval_impl)
 
