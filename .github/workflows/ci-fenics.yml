@@ -1,6 +1,10 @@
-name: CI
+name: FEniCS
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
 
@@ -8,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 1
 
@@ -40,7 +44,7 @@ jobs:
           conda activate fenicsproject
           python -m pip install --upgrade pip
           python -m pip install git+https://github.com/dolfin-adjoint/pyadjoint.git@master
-          python -m pip install git+https://github.com/IvanYashchuk/numpy-fenics-adjoint
+          python -m pip install git+https://github.com/IvanYashchuk/fecr@master
           python -m pip install pytest
           python -m pip install pytest-cov
           python -m pip install pytest-check
@@ -65,5 +69,5 @@ jobs:
         run: |
           conda activate fenicsproject
           python -c "import sys; print('\n'.join(sys.path))"
-          python -m pytest --cov=jaxfenics_adjoint tests/
+          python -m pytest --cov=jaxfenics_adjoint tests/fenics -vvv
           coveralls
