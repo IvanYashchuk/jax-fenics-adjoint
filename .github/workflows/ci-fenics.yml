@@ -64,10 +64,15 @@ jobs:
 
       - name: Test with pytest
         shell: bash -l {0}
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: |
           conda activate fenicsproject
           python -c "import sys; print('\n'.join(sys.path))"
           python -m pytest --cov=jaxfenics_adjoint tests/fenics -vvv
+
+      - name: Send coveralls
+        shell: bash -l {0}
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        run: |
+          conda activate fenicsproject
           coveralls
