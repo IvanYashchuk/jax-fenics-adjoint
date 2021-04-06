@@ -12,7 +12,7 @@ import fenics_adjoint as fa
 import ufl
 
 from jaxfenics_adjoint import build_jax_fem_eval
-from jaxfenics_adjoint import numpy_to_fenics, fenics_to_numpy
+from jaxfenics_adjoint import from_numpy
 
 import matplotlib.pyplot as plt
 
@@ -121,7 +121,7 @@ res = minimize_ipopt(
     options={"print_level": 5, "max_iter": 100},
 )
 
-rho_opt_final = numpy_to_fenics(res.x, fa.Function(C))
+rho_opt_final = from_numpy(res.x, fa.Function(C))
 
 c = fn.plot(rho_opt_final)
 plt.colorbar(c)
