@@ -18,7 +18,7 @@ import ufl
 import logging
 
 from jaxfenics_adjoint import build_jax_fem_eval
-from jaxfenics_adjoint import numpy_to_fenics, fenics_to_numpy
+from jaxfenics_adjoint import from_numpy
 
 import matplotlib.pyplot as plt
 
@@ -154,7 +154,7 @@ res = minimize(
     options={"verbose": 3, "gtol": 1e-7, "maxiter": 100},
 )
 
-rho_opt_final = numpy_to_fenics(res.x, fenics.Function(A))
+rho_opt_final = from_numpy(res.x, fenics.Function(A))
 
 c = fenics.plot(rho_opt_final)
 plt.colorbar(c)

@@ -20,7 +20,7 @@ import fenics_adjoint as fa
 import ufl
 
 from jaxfenics_adjoint import build_jax_fem_eval
-from jaxfenics_adjoint import numpy_to_fenics, fenics_to_numpy
+from jaxfenics_adjoint import from_numpy
 
 import matplotlib.pyplot as plt
 
@@ -98,7 +98,7 @@ w = ufl.sin(ufl.pi * x[0]) * ufl.sin(ufl.pi * x[1])
 f_analytic = 1 / (1 + alpha * 4 * ufl.pi ** 4) * w
 u_analytic = 1 / (2 * ufl.pi ** 2) * f_analytic
 
-f_opt = numpy_to_fenics(res.x, fn.Function(W))
+f_opt = from_numpy(res.x, fn.Function(W))
 u = fn.Function(V)
 v = fn.TestFunction(V)
 F = (ufl.inner(ufl.grad(u), ufl.grad(v)) - f_opt * v) * ufl.dx
