@@ -3,6 +3,7 @@ import jax.numpy as np
 
 from jax.core import Primitive
 from jax.custom_derivatives import custom_vjp
+from jax._src import ad_util
 
 import dataclasses
 import functools
@@ -68,7 +69,7 @@ def get_pullback_function(
             fe_aux.tape,
         )
         return tuple(
-            vjp if vjp is not None else jax.ad_util.zeros_like_jaxval(args[i])
+            vjp if vjp is not None else ad_util.zeros_like_jaxval(args[i])
             for i, vjp in enumerate(
                 evaluate_pullback(fenics_output, fenics_inputs, tape, g)
             )

@@ -3,6 +3,7 @@ import numpy as np
 
 import fecr
 from fecr import from_numpy
+from jax._src import ad_util
 
 import warnings
 
@@ -19,7 +20,7 @@ def jax_to_fenics_numpy(jax_array: JAXArray, fem_variable: BackendVariable) -> n
     fem_backend = fecr._backends.get_backend(fem_variable)
 
     # JAX tracer specific part. Here we return zero values if tracer is not ConcreteArray type.
-    if isinstance(jax_array, jax.ad_util.Zero):
+    if isinstance(jax_array, ad_util.Zero):
         if isinstance(fem_variable, fem_backend.lib.Constant):
             numpy_array = np.zeros_like(fem_variable.values())
             return numpy_array

@@ -6,6 +6,7 @@ import numpy
 from jaxfenics_adjoint import from_jax
 
 import jax
+from jax._src import ad_util
 from jax.config import config
 import jax.numpy
 
@@ -23,7 +24,7 @@ get_aval = jax.core.get_aval
         (make_shaped_array(jax.numpy.ones(2)), firedrake.Constant([0.0, 0.0])),
         (get_aval(jax.numpy.asarray(0.66)), firedrake.Constant(0.66)),
         (get_aval(jax.numpy.asarray([0.5, 0.66])), firedrake.Constant([0.5, 0.66]),),
-        (jax.ad_util.Zero(get_aval(jax.numpy.asarray(0.0))), firedrake.Constant(0.0)),
+        (ad_util.Zero(get_aval(jax.numpy.asarray(0.0))), firedrake.Constant(0.0)),
     ],
 )
 def test_from_jax_constant(test_input, expected):
@@ -41,7 +42,7 @@ def _x0(mesh):
     [
         (make_shaped_array(jax.numpy.ones(10)), lambda mesh: firedrake.Constant(0.0)),
         (
-            jax.ad_util.Zero(get_aval(jax.numpy.asarray(0.0))),
+            ad_util.Zero(get_aval(jax.numpy.asarray(0.0))),
             lambda mesh: firedrake.Constant(0.0),
         ),
         (get_aval(jax.numpy.linspace(0.05, 0.95, num=10)), _x0),
