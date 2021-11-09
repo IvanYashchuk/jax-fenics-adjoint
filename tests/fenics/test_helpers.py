@@ -8,13 +8,12 @@ from jaxfenics_adjoint import from_jax
 import jax
 from jax._src import ad_util
 from jax.config import config
+from jax.core import get_aval
+from jax._src import ad_util
+from jax._src.abstract_arrays import make_shaped_array
 import jax.numpy
 
 config.update("jax_enable_x64", True)
-
-# Test JAX specific conversions here
-make_shaped_array = jax.abstract_arrays.make_shaped_array
-get_aval = jax.core.get_aval
 
 
 @pytest.mark.parametrize(
@@ -23,7 +22,10 @@ get_aval = jax.core.get_aval
         (make_shaped_array(jax.numpy.ones(1)), fenics.Constant(0.0)),
         (make_shaped_array(jax.numpy.ones(2)), fenics.Constant([0.0, 0.0])),
         (get_aval(jax.numpy.asarray(0.66)), fenics.Constant(0.66)),
-        (get_aval(jax.numpy.asarray([0.5, 0.66])), fenics.Constant([0.5, 0.66]),),
+        (
+            get_aval(jax.numpy.asarray([0.5, 0.66])),
+            fenics.Constant([0.5, 0.66]),
+        ),
         (ad_util.Zero(get_aval(jax.numpy.asarray(0.0))), fenics.Constant(0.0)),
     ],
 )

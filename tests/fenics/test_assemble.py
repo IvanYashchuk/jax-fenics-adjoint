@@ -44,9 +44,10 @@ def test_jacobian_and_vjp():
     jax_jac0 = jax.jacrev(hh0)(inputs[0])
     with check:
         assert np.allclose(fdm_jac0, jax_jac0)
-    v0 = np.asarray(onp.random.normal(size=(1,)))
-    fdm_vjp0 = v0 @ fdm_jac0
-    jax_vjp0 = jax.vjp(hh0, inputs[0])[1](v0)
+    v0 = np.asarray(onp.random.normal(size=()))
+    fdm_vjp0 = v0[None] @ fdm_jac0
+    # jax.vjp now returns a tuple
+    jax_vjp0 = jax.vjp(hh0, inputs[0])[1](v0)[0]
     with check:
         assert np.allclose(fdm_vjp0, jax_vjp0)
 
@@ -54,9 +55,10 @@ def test_jacobian_and_vjp():
     jax_jac1 = jax.jacrev(hh1)(inputs[1])
     with check:
         assert np.allclose(fdm_jac1, jax_jac1)
-    v1 = np.asarray(onp.random.normal(size=(1,)))
-    fdm_vjp1 = v1 @ fdm_jac1
-    jax_vjp1 = jax.vjp(hh1, inputs[1])[1](v1)
+    v1 = np.asarray(onp.random.normal(size=()))
+    fdm_vjp1 = v1[None] @ fdm_jac1
+    # jax.vjp now returns a tuple
+    jax_vjp1 = jax.vjp(hh1, inputs[1])[1](v1)[0]
     with check:
         assert np.allclose(fdm_vjp1, jax_vjp1)
 
@@ -64,9 +66,10 @@ def test_jacobian_and_vjp():
     jax_jac2 = jax.jacrev(hh2)(inputs[2])
     with check:
         assert np.allclose(fdm_jac2, jax_jac2)
-    v2 = np.asarray(onp.random.normal(size=(1,)))
-    fdm_vjp2 = v2 @ fdm_jac2
-    jax_vjp2 = jax.vjp(hh2, inputs[2])[1](v2)
+    v2 = np.asarray(onp.random.normal(size=()))
+    fdm_vjp2 = v2[None] @ fdm_jac2
+    # jax.vjp now returns a tuple
+    jax_vjp2 = jax.vjp(hh2, inputs[2])[1](v2)[0]
     with check:
         assert np.allclose(fdm_vjp2, jax_vjp2)
 

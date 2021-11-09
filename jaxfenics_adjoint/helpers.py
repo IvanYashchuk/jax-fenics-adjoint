@@ -1,4 +1,6 @@
 import jax
+from jax._src import ad_util
+from jax._src.abstract_arrays import ConcreteArray, ShapedArray
 import numpy as np
 
 import fecr
@@ -32,15 +34,15 @@ def jax_to_fenics_numpy(jax_array: JAXArray, fem_variable: BackendVariable) -> n
         numpy_array = jax.core.get_aval(jax_array)
         return numpy_array
 
-    elif isinstance(jax_array, (jax.abstract_arrays.ShapedArray,)):
-        if not isinstance(jax_array, (jax.abstract_arrays.ConcreteArray,)):
+    elif isinstance(jax_array, (ShapedArray,)):
+        if not isinstance(jax_array, (ConcreteArray,)):
             warnings.warn(
                 "Got JAX tracer type to convert to FEniCS/Firedrake. Returning zero."
             )
             numpy_array = np.zeros(jax_array.shape)
             return numpy_array
 
-        elif isinstance(jax_array, (jax.abstract_arrays.ConcreteArray,)):
+        elif isinstance(jax_array, (ConcreteArray,)):
             numpy_array = jax_array.val
             return numpy_array
 
