@@ -4,7 +4,6 @@ from jax._src import ad_util
 
 from jax.core import Primitive
 from jax.custom_derivatives import custom_vjp
-from jax._src import ad_util
 
 import dataclasses
 import functools
