@@ -6,7 +6,6 @@ import numpy
 from jaxfenics_adjoint import from_jax
 
 import jax
-from jax._src import ad_util
 from jax.config import config
 from jax.core import get_aval
 from jax._src import ad_util
