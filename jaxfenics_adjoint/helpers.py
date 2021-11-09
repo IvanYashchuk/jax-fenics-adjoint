@@ -5,7 +5,6 @@ import numpy as np
 
 import fecr
 from fecr import from_numpy
-from jax._src import ad_util
 
 import warnings
 
