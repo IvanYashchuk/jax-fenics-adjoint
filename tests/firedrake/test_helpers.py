@@ -7,13 +7,12 @@ from jaxfenics_adjoint import from_jax
 
 import jax
 from jax.config import config
+from jax.core import get_aval
+from jax._src import ad_util
+from jax._src.abstract_arrays import make_shaped_array
 import jax.numpy
 
 config.update("jax_enable_x64", True)
-
-# Test JAX specific conversions here
-make_shaped_array = jax.abstract_arrays.make_shaped_array
-get_aval = jax.core.get_aval
 
 
 @pytest.mark.parametrize(
@@ -22,8 +21,11 @@ get_aval = jax.core.get_aval
         (make_shaped_array(jax.numpy.ones(1)), firedrake.Constant(0.0)),
         (make_shaped_array(jax.numpy.ones(2)), firedrake.Constant([0.0, 0.0])),
         (get_aval(jax.numpy.asarray(0.66)), firedrake.Constant(0.66)),
-        (get_aval(jax.numpy.asarray([0.5, 0.66])), firedrake.Constant([0.5, 0.66]),),
-        (jax.ad_util.Zero(get_aval(jax.numpy.asarray(0.0))), firedrake.Constant(0.0)),
+        (
+            get_aval(jax.numpy.asarray([0.5, 0.66])),
+            firedrake.Constant([0.5, 0.66]),
+        ),
+        (ad_util.Zero(get_aval(jax.numpy.asarray(0.0))), firedrake.Constant(0.0)),
     ],
 )
 def test_from_jax_constant(test_input, expected):
@@ -41,7 +43,7 @@ def _x0(mesh):
     [
         (make_shaped_array(jax.numpy.ones(10)), lambda mesh: firedrake.Constant(0.0)),
         (
-            jax.ad_util.Zero(get_aval(jax.numpy.asarray(0.0))),
+            ad_util.Zero(get_aval(jax.numpy.asarray(0.0))),
             lambda mesh: firedrake.Constant(0.0),
         ),
         (get_aval(jax.numpy.linspace(0.05, 0.95, num=10)), _x0),

@@ -74,7 +74,8 @@ def test_jacobian_and_vjp():
             assert np.allclose(fdm_jac, jax_jac)
 
         fdm_vjp = v @ fdm_jac
-        jax_vjp = jax.vjp(func, inp)[1](v)
+        # jax.vjp now returns a tuple
+        jax_vjp = jax.vjp(func, inp)[1](v)[0]
 
         with check:
             assert np.allclose(fdm_vjp, jax_vjp)
