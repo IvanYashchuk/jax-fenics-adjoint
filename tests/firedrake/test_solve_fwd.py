@@ -23,7 +23,7 @@ def solve_firedrake(q, kappa0, kappa1):
     f = x[0]
 
     u = firedrake.Function(V)
-    bcs = [firedrake.DirichletBC(V, firedrake.Constant(0.0), "on_boundary")]
+    bcs = [firedrake.DirichletBC(V, kappa1, "on_boundary")]
 
     inner, grad, dx = ufl.inner, ufl.grad, ufl.dx
     JJ = 0.5 * inner(kappa0 * grad(u), grad(u)) * dx - q * kappa1 * f * u * dx
@@ -38,7 +38,7 @@ inputs = (np.ones(V.dim()), np.ones(1), np.ones(1) * 1.2)
 jax_fem_eval = build_jax_fem_eval_fwd(templates)(solve_firedrake)
 
 # multivariate output function
-ff = lambda x, y, z: np.sin(np.cos(jax_fem_eval(x, np.sqrt(y ** 3), z)))  # noqa: E731
+ff = lambda x, y, z: np.sin(np.cos(jax_fem_eval(x, np.sqrt(y**3), z)))  # noqa: E731
 ff0 = lambda x: ff(x, inputs[1], inputs[2])  # noqa: E731
 ff1 = lambda y: ff(inputs[0], y, inputs[2])  # noqa: E731
 ff2 = lambda z: ff(inputs[0], inputs[1], z)  # noqa: E731
