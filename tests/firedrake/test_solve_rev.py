@@ -22,7 +22,7 @@ def solve_firedrake(q, kappa0, kappa1):
     f = x[0]
 
     u = firedrake.Function(V)
-    bcs = [firedrake.DirichletBC(V, firedrake.Constant(0.0), "on_boundary")]
+    bcs = [firedrake.DirichletBC(V, kappa1, "on_boundary")]
 
     inner, grad, dx = ufl.inner, ufl.grad, ufl.dx
     JJ = 0.5 * inner(kappa0 * grad(u), grad(u)) * dx - q * kappa1 * f * u * dx
@@ -38,7 +38,7 @@ jax_solve_eval = build_jax_fem_eval(templates)(solve_firedrake)
 
 # multivariate output function
 ff = lambda x, y, z: np.sqrt(  # noqa: E731
-    np.square(jax_solve_eval(x, np.sqrt(y ** 3), z))
+    np.square(jax_solve_eval(x, np.sqrt(y**3), z))
 )
 ff0 = lambda x: ff(x, inputs[1], inputs[2])  # noqa: E731
 ff1 = lambda y: ff(inputs[0], y, inputs[2])  # noqa: E731
@@ -80,7 +80,7 @@ def test_jacobian_and_vjp():
 
 # scalar output function
 f_scalar = lambda x, y, z: np.sqrt(  # noqa: E731
-    np.sum(np.square(jax_solve_eval(x, np.sqrt(y ** 3), z)))
+    np.sum(np.square(jax_solve_eval(x, np.sqrt(y**3), z)))
 )
 h_scalar = lambda y: f_scalar(inputs[0], y, inputs[2])  # noqa: E731
 fs0 = lambda x: f_scalar(x, inputs[1], inputs[2])  # noqa: E731

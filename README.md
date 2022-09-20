@@ -9,7 +9,7 @@ For using JAX-FEniCS without dolfin-adjoint (still differentiable with automatic
 
 Current limitations:
 * Composition of forward and reverse modes for higher-order derivatives is not implemented yet.
-* Differentiation wrt Dirichlet boundary conditions and mesh coordinates is not implemented yet.
+* Differentiation with respect to mesh coordinates is not implemented yet.
 
 ## Example
 Here is the demonstration of solving the [Poisson's PDE](https://en.wikipedia.org/wiki/Poisson%27s_equation)

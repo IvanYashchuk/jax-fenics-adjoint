@@ -36,7 +36,7 @@ jobs:
         run: |
           conda config --set always_yes yes
           conda config --add channels conda-forge
-          mamba create -n fenicsproject -c conda-forge fenics superlu_dist=6.2.0
+          mamba create -n fenicsproject -c conda-forge fenics
           conda activate fenicsproject
           which python
           python -c "from dolfin import *"
