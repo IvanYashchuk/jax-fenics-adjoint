@@ -70,7 +70,11 @@ Check `examples/` or `tests/` folders for the additional examples.
 
 ## Installation
 First install [FEniCS](https://fenicsproject.org/download/) or [Firedrake](https://firedrakeproject.org/download.html).
-Then install [pyadjoint](http://www.dolfin-adjoint.org/en/latest/) with:
+Then install [pyadjoint](http://www.dolfin-adjoint.org/en/latest/) for FEniCS with:
+
+    python -m pip install git+https://github.com/dolfin-adjoint/pyadjoint.git@2023.0.0
+
+or for Firedrake with:
 
     python -m pip install git+https://github.com/dolfin-adjoint/pyadjoint.git@master
 
